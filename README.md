@@ -29,7 +29,7 @@ Messages are stored in a client-side collection to support client debugging and 
 
 Begin with:
 ```javascript
-import { Log } from "meteor/validatis:log";
+import { Log } from "meteor/convexset:log";
 ```
 
 ### Basics
