@@ -1,0 +1,27 @@
+<head>
+	<title>convexset:log</title>
+</head>
+
+<body>
+	<h1>convexset:log</h1>
+	
+	{{> info}}
+</body>
+
+<template name="info">
+	Look in the console.
+	
+	<h3>Client Log</h3>
+	<ul>
+		{{#each clientLog}}
+			<li>{{this}}</li>
+		{{/each}}
+	</ul>
+	
+	<h3>Server Log</h3>
+	<ul>
+		{{#each serverLog}}
+			<li>{{this}}</li>
+		{{/each}}
+	</ul>
+</template>
