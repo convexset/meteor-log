@@ -21,7 +21,7 @@ Messages are stored in a client-side collection to support client debugging and 
 - [Structured Exception Throwing](#structured-exception-throwing)
 - [Beyond `Meteor.isDevelopment`](#beyond-meteorisdevelopment)
 - [Additional Usage Hints](#additional-usage-hints)
-- [Development Patterns](#development-patterns)
+- [Implementation Patterns](#implementation-patterns)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -265,7 +265,7 @@ Meteor.startup(function() {
 });
 ```
 
-## Development Patterns
+## Implementation Patterns
 
  - Detailed logging and verbosity level shifting for development
    * Initial development at high verbosity and status messages (tagged by component) with similar verbosity levels
@@ -276,4 +276,6 @@ Meteor.startup(function() {
  - It is not possible to not expose `Log` on the client in production (c.f.: `Packages`). Too much detail makes reverse engineering your product easier. Strike a balance.
  - Off-site server recording in production (to not overload the main production database)
  - Hooking of additional handlers whenever logging methods are called
+   * e.g.: on-screen notifications
+   * e.g.: major issues -> Slack/HipChat/IM
  - Clean exception handling
