@@ -127,7 +127,12 @@ Log.storeServerMessages({
         }, {
             pubName: "log-100",
             selector: {},
-            limit: 100
+            options: {
+                limit: 100,
+                sort: {
+                    ts: 1
+                }
+            }
             pubAuthFunction: function () {
                 return !!this.userId;
             }
