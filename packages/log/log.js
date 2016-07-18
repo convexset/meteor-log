@@ -12,7 +12,7 @@ const _ = require('underscore');
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { EJSON } from 'meteor/ejson';
-import { DDP } from 'meteor/ddp-client'
+import { DDP } from 'meteor/ddp-client';
 
 ////////////////////////////////////////////////////////////////////////////////
 // The Main Event
@@ -208,7 +208,7 @@ const Log = (function() {
 		return LOG_LEVELS.indexOf(ll) !== -1;
 	}
 	LOG_LEVELS.forEach(function(logLevel) {
-		PackageUtilities.addImmutablePropertyFunction(_log, logLevel, function logger(verbosityOrOptions, ...args) {
+		var logFunction = function logger(verbosityOrOptions, ...args) {
 			// Handle Options
 			var options;
 			if (_.isObject(verbosityOrOptions)) {
@@ -273,7 +273,7 @@ const Log = (function() {
 							var clientAddress = context.connection.clientAddress || "127.0.0.1";
 							var xFwdFor = context.connection.httpHeaders && context.connection.httpHeaders['x-forwarded-for'];
 							if (clientAddress !== "127.0.0.1") {
-								record.ca = clientAddress
+								record.ca = clientAddress;
 							} else {
 								record.xf = xFwdFor;
 							}
@@ -284,7 +284,15 @@ const Log = (function() {
 			}
 
 			_additionalLogHandlers.forEach(fn => fn(options));
+		};
+
+		PackageUtilities.addImmutablePropertyFunction(logFunction, "withParams", function createLogger(verbosityOrOptions) {
+			return function loggerWithParams(...args) {
+				return logFunction.apply(this, [verbosityOrOptions].concat(args));
+			};
 		});
+
+		PackageUtilities.addImmutablePropertyFunction(_log, logLevel, logFunction);
 	});
 
 

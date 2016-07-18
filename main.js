@@ -26,6 +26,32 @@ Log.registerException("item-out-of-range", function oorMessage({
 
 var serverCollection = new Mongo.Collection("log");
 
+/* global logWithVerbosity3: true */
+/* global logWithVerbosity7andTag: true */
+logWithVerbosity3 = Log.log.withParams(3);
+logWithVerbosity7andTag = Log.log.withParams({
+	verbosity: 7,
+	tags: ["boo"]
+});
+infoWithVerbosity7andTag = Log.info.withParams({
+	verbosity: 7,
+	tags: ["boo"]
+});
+if (Meteor.isClient) {
+	Log.registerAdditionalLogHandler(function alsoAlert(opts) {
+		if ((opts.tags.indexOf("boo") > -1) && (opts.logLevel === "log")) {
+			console.info(["[log|with tag \"boo\"]"].concat(opts.args).join(" "));
+		}
+	});
+
+	setTimeout(() => {
+		logWithVerbosity3("what LL3");
+		logWithVerbosity7andTag("LL7", "zzz", "123");
+		infoWithVerbosity7andTag("LL7", "abc");
+	}, 2000);
+}
+
+
 const TEST_EXCEPTIONS_IN_CALLBACKS = true;
 if (TEST_EXCEPTIONS_IN_CALLBACKS) {
 	Meteor.setTimeout(function invalidArgumentTest() {
