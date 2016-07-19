@@ -293,7 +293,9 @@ const throwNaNException = Log.prepareExceptionThrower("not-a-number", {
 const throwNaNException_Simpler = Log.prepareExceptionThrower("not-a-number");
 // invoke with: throwNaNException("7");
 ```
+Specifically, to prepare an "exception thrower", pass in the name of the exception and an optional set of parameters that one might otherwise pass as the third parameter of `Log.throwException`.
 
+Simply invoke the returned "exception thrower" to throw the exception. If the exception takes a `data` parameter, pass in that data as the sole argument.
 
 
 ## Beyond `Meteor.isDevelopment`
