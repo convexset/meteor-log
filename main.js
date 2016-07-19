@@ -18,6 +18,11 @@ Log.registerException("invalid-argument", "Your argument is invalid.");
 Log.registerException("not-a-number", function nanMessage(item) {
 	return `${item} is not a number.`;
 });
+
+const throwNaNException = Log.prepareExceptionThrower("not-a-number", {
+	verbosity: 1,
+	logLevel: "warn"
+});
 Log.registerException("item-out-of-range", function oorMessage({
 	validRange, item
 }) {
@@ -78,6 +83,8 @@ if (Meteor.isClient) {
 		logWithVerbosity3("what LL3");
 		logWithVerbosity7andTag("LL7", "zzz", "123");
 		infoWithVerbosity7andTag("LL7", "abc");
+
+		throwNaNException("really not a number");
 	}, 2000);
 }
 
@@ -96,7 +103,7 @@ if (TEST_EXCEPTIONS_IN_CALLBACKS) {
 		(function someRecursiveThing(dp = 0) {
 			if (Math.random() < 0.25 + dp) {
 				Log.throwException("not-a-number", "9", {
-					logLevel: "warn", // valid choices: "log", "info", "warn", "error"
+					logLevel: "info", // valid choices: "log", "info", "warn", "error"
 					verbosity: 7
 				});
 			} else {

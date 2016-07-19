@@ -353,6 +353,13 @@ const Log = (function() {
 		throw exception;
 	});
 
+	PackageUtilities.addImmutablePropertyFunction(_log, "prepareExceptionThrower", function prepareExceptionThrower(exceptionName, additionalOptions) {
+		var _additionalOptions = PackageUtilities.deepCopy(additionalOptions);
+		return function exceptionThrower(data) {
+			return _log.throwException(exceptionName, data, _additionalOptions);
+		};
+	});
+
 
 	////////////////////////////////////////////////////////////////////////////
 
