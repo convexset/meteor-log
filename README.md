@@ -283,7 +283,7 @@ Log.throwException("item-out-of-range", {
 ### Partial Application
 
 Partial application support is available for exceptions as well. See the following examples:
-```
+```javascript
 const throwNaNException = Log.prepareExceptionThrower("not-a-number", {
   verbosity: 1,
   logLevel: "warn"
