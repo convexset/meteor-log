@@ -219,6 +219,8 @@ Each added hook is invoked with a single argument taking the form of objects (wi
 
 The handlers are fired after logging and recording (into collections, where applicable) happen.
 
+See example app (which is more akin to a dump truck than an "app") for an instance of using an additional log handler to send messages of a certain type (by `logLevel` and `tags`) to a chat room. (This is useful for alerting customer support of something bad happening that would probably require a quick response... Or to give the illusion of rapid and effective response.)
+
 
 ## Structured Exception Throwing
 

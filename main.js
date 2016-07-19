@@ -37,13 +37,39 @@ infoWithVerbosity7andTag = Log.info.withParams({
 	verbosity: 7,
 	tags: ["boo"]
 });
-if (Meteor.isClient) {
-	Log.registerAdditionalLogHandler(function alsoAlert(opts) {
-		if ((opts.tags.indexOf("boo") > -1) && (opts.logLevel === "log")) {
-			console.info(["[log|with tag \"boo\"]"].concat(opts.args).join(" "));
+
+if (Meteor.isServer) {
+	/* HipChat hook example */
+	var HipChatClient = require('hipchat-client');
+	/* global hipChatConfig: true */
+	hipChatConfig = {
+		token: "",
+		instructions: "Set API token in this object (initially blank). Do not replace the entire object."
+	};
+	Log.registerAdditionalLogHandler(function alsoHipchat(opts) {
+		if ((opts.tags.indexOf("boo") > -1) && (opts.logLevel === "info")) {
+			if (!!hipChatConfig.token) {
+				var hipchat = new HipChatClient(hipChatConfig.token);
+				return hipchat.api.rooms.message({
+					room_id: 2749584,
+					from: "convexset:log",
+					message: `[<code>log</code>|with tag <code>boo</code>] ${opts.args.join(" ")}; Tags: ${opts.tags.join(", ")}`,
+					message_format: "html",
+					color: "random",
+					notify: 1
+				}, function(err, res) {
+					if (!!err) {
+						console.log("[hipchat-client|error]", err);
+					}
+					if (!!res) {
+						console.log("[hipchat-client|result]", res);
+					}
+				});
+			}
 		}
 	});
-
+}
+if (Meteor.isClient) {
 	setTimeout(() => {
 		logWithVerbosity3("what LL3");
 		logWithVerbosity7andTag("LL7", "zzz", "123");

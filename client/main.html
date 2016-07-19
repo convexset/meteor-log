@@ -13,15 +13,15 @@
 	
 	<h3>Client Log</h3>
 	<ul>
-		{{#each clientLog}}
-			<li>{{this}}</li>
+		{{#each logItem in clientLog}}
+			<li>{{logItem}}</li>
 		{{/each}}
 	</ul>
 	
 	<h3>Server Log</h3>
 	<ul>
-		{{#each serverLog}}
-			<li>{{this}}</li>
+		{{#each logItem in serverLog}}
+			<li>{{logItem}}</li>
 		{{/each}}
 	</ul>
 </template>
