@@ -29,13 +29,17 @@ var serverCollection = new Mongo.Collection("log");
 /* global logWithVerbosity3: true */
 /* global logWithVerbosity7andTag: true */
 logWithVerbosity3 = Log.log.withParams(3);
-logWithVerbosity7andTag = Log.log.withParams({
+var opts = {
 	verbosity: 7,
-	tags: ["boo"]
-});
-infoWithVerbosity7andTag = Log.info.withParams({
-	verbosity: 7,
-	tags: ["boo"]
+	tags: ["boo", "log"]
+};
+logWithVerbosity7andTag = Log.log.withParams(opts);
+opts.tags = ["boo", "info"];
+infoWithVerbosity7andTag = Log.info.withParams(opts);
+Log.registerAdditionalLogHandler(function alsoAlert(opts) {
+	if ((opts.tags.indexOf("boo") > -1) && (opts.logLevel === "log")) {
+		console.info(["[log|with tag \"boo\"]"].concat(opts.args).join(" "));
+	}
 });
 
 if (Meteor.isServer) {

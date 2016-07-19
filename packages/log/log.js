@@ -286,9 +286,10 @@ const Log = (function() {
 			_additionalLogHandlers.forEach(fn => fn(options));
 		};
 
-		PackageUtilities.addImmutablePropertyFunction(logFunction, "withParams", function createLogger(verbosityOrOptions) {
+		PackageUtilities.addImmutablePropertyFunction(logFunction, "withParams", function withParams(verbosityOrOptions) {
+			var _verbosityOrOptions = PackageUtilities.deepCopy(verbosityOrOptions);
 			return function loggerWithParams(...args) {
-				return logFunction.apply(this, [verbosityOrOptions].concat(args));
+				return logFunction.apply(this, [_verbosityOrOptions].concat(args));
 			};
 		});
 
