@@ -1,0 +1,32 @@
+<template name="convexset:log/table">
+	<table class="{{tableClasses}}" {{tableAttributes}}>
+		<thead class="{{theadClasses}}" {{theadAttributes}}>
+			<tr class="{{trClasses}}" {{trAttributes}}>
+				<th class="{{thClasses}}" {{thAttributes}}>ts</th>
+				<th class="{{thClasses}}" {{thAttributes}}>v</th>
+				<th class="{{thClasses}}" {{thAttributes}}>ll</th>
+				<th class="{{thClasses}}" {{thAttributes}}>tags</th>
+				<th class="{{thClasses}}" {{thAttributes}}>msg</th>
+			</tr>
+		</thead>
+		<tbody class="{{tbodyClasses}}" {{tbodyAttributes}}>
+			{{#each logItem in clientLog}}
+				{{#with logItem}}
+					<tr class="{{trClasses}}" {{trAttributes}}>
+						<td class="{{tdClasses}}" {{tdAttributes}}>{{{ts}}}</td>
+						<td class="{{tdClasses}}" {{tdAttributes}}><code>{{v}}</code></td>
+						<td class="{{tdClasses}}" {{tdAttributes}}><code>{{ll}}</code></td>
+						<td class="{{tdClasses}}" {{tdAttributes}}>
+							<ul>
+								{{#each tag in tags}}
+									<li><code>{{tag}}</code></li>
+								{{/each}}
+							</ul>
+						</td>
+						<td class="{{tdClasses}}" {{tdAttributes}}>{{{msg}}}</td>
+					</tr>
+				{{/with}}
+			{{/each}}
+		</tbody>
+	</table>	
+</template>

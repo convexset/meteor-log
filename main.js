@@ -26,7 +26,7 @@ const throwNaNException = Log.prepareExceptionThrower("not-a-number", {
 Log.registerException("item-out-of-range", function oorMessage({
 	validRange, item
 }) {
-	return `Item out of range (item: ${item}, valid range: ${validRange})`;
+	return `Item out of range (item: ${item}, valid range: [${validRange}])`;
 });
 
 var serverCollection = new Mongo.Collection("log");
@@ -88,6 +88,23 @@ if (Meteor.isClient) {
 	}, 2000);
 }
 
+Log.info({
+    appendStackTrace: true,
+    tags: ["stack-trace"]
+}, "Get stack trace.");
+
+if (Meteor.isServer) {
+	Meteor.methods({
+		"capture-stack-in-method": function() {
+			Log.info({
+			    appendStackTrace: true,
+			    tags: ["stack-trace", "meteor-method"]
+			}, "Get stack trace within Meteor Method invocation.");
+		}
+	})
+} else {
+	Meteor.call("capture-stack-in-method");
+}
 
 const TEST_EXCEPTIONS_IN_CALLBACKS = true;
 if (TEST_EXCEPTIONS_IN_CALLBACKS) {
@@ -127,7 +144,11 @@ if (Meteor.isClient) {
 	Meteor.subscribe("log");
 
 	Template.info.helpers({
-		clientLog: () => Log.allRecords.map(x => EJSON.stringify(x)),
+		tableData: () => ({
+			tableAttributes: {
+				border: 1
+			}
+		}),
 		serverLog: () => serverCollection.find().map(x => EJSON.stringify(x)),
 	});
 }

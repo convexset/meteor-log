@@ -9,14 +9,10 @@
 </body>
 
 <template name="info">
-	Look in the console.
-	
 	<h3>Client Log</h3>
-	<ul>
-		{{#each logItem in clientLog}}
-			<li>{{logItem}}</li>
-		{{/each}}
-	</ul>
+	{{> Template.dynamic template="convexset:log/table" data=tableData}}
+
+	<hr>
 	
 	<h3>Server Log</h3>
 	<ul>
