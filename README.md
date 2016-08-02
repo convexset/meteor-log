@@ -15,6 +15,7 @@ Messages are stored in a client-side collection to support client debugging and 
 
 - [Usage:](#usage)
   - [Basics](#basics)
+  - [Capturing the stack](#capturing-the-stack)
   - [Temporary Nuance in Display](#temporary-nuance-in-display)
   - [Client-side Recording](#client-side-recording)
   - [Server-side Recording](#server-side-recording)
@@ -61,6 +62,16 @@ Log.info({
     tags: ["cats", "pets"]
 }, "I have one cat.");
 ```
+
+### Capturing the stack
+
+Simply use set the `appendStackTrace` option to `true` (default: `false):
+```javascript
+Log.info({
+    appendStackTrace: true
+}, "Stack trace:");
+```
+and a stack-trace will be appended to the list of arguments passed into the logger.
 
 ### Temporary Nuance in Display
 

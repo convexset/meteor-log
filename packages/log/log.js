@@ -226,11 +226,20 @@ const Log = (function() {
 			options = _.extend({
 				verbosity: 5,
 				tags: [],
-				record: true
+				record: true,
+				appendStackTrace: false
 			}, options, {
 				logLevel: logLevel,
 				args: args
 			});
+
+			if (options.appendStackTrace) {
+				// Obtain stack trace and remove reference to this function
+				let _stackTraceArr = (new Meteor.Error("not-an-exception")).stack.split("\n");
+				_stackTraceArr.splice(0, 2);
+				let stackTrace = _stackTraceArr.join("\n");
+				args.push(stackTrace);
+			}
 
 			if (_displayPredicate() && ((!_.isFunction(_currentDisplayFilter)) || _currentDisplayFilter(options)) && (options.verbosity <= _verbosity)) {
 				// possibly display if in dev mode and verbosity level is right
