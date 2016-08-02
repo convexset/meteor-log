@@ -88,14 +88,17 @@ LogTableTemplate.onCreated(function() {
 });
 
 LogTableTemplate.helpers({
-	clientLog: () => Log.allRecords.map(function(logEntry) {
-		var ret = {
-			v: logEntry.v,
-			ll: logEntry.ll,
-			tags: logEntry.tags,
-		};
-		ret.ts = Template.instance().tsTransform(logEntry.ts);
-		ret.msg = EJSON.parse(logEntry.msg).map(Template.instance().msgTransform).join(" ");
-		return ret;
-	}),
+	parsedData: function() {
+		var context = Template.currentData() || {};
+		return (context.logEntries || []).map(function(logEntry) {
+			var ret = {
+				v: logEntry.v,
+				ll: logEntry.ll,
+				tags: logEntry.tags,
+			};
+			ret.ts = Template.instance().tsTransform(logEntry.ts);
+			ret.msg = EJSON.parse(logEntry.msg).map(Template.instance().msgTransform).join(" ");
+			return ret;
+		});
+	}
 });

@@ -10,14 +10,10 @@
 
 <template name="info">
 	<h3>Client Log</h3>
-	{{> Template.dynamic template="convexset:log/table" data=tableData}}
+	{{> Template.dynamic template="convexset:log/table" data=clientLogData}}
 
 	<hr>
 	
 	<h3>Server Log</h3>
-	<ul>
-		{{#each logItem in serverLog}}
-			<li>{{logItem}}</li>
-		{{/each}}
-	</ul>
+	{{> Template.dynamic template="convexset:log/table" data=serverLogData}}
 </template>

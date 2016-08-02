@@ -29,8 +29,6 @@ Log.registerException("item-out-of-range", function oorMessage({
 	return `Item out of range (item: ${item}, valid range: [${validRange}])`;
 });
 
-var serverCollection = new Mongo.Collection("log");
-
 /* global logWithVerbosity3: true */
 /* global logWithVerbosity7andTag: true */
 logWithVerbosity3 = Log.log.withParams(3);
@@ -93,19 +91,6 @@ Log.info({
     tags: ["stack-trace"]
 }, "Get stack trace.");
 
-if (Meteor.isServer) {
-	Meteor.methods({
-		"capture-stack-in-method": function() {
-			Log.info({
-			    appendStackTrace: true,
-			    tags: ["stack-trace", "meteor-method"]
-			}, "Get stack trace within Meteor Method invocation.");
-		}
-	})
-} else {
-	Meteor.call("capture-stack-in-method");
-}
-
 const TEST_EXCEPTIONS_IN_CALLBACKS = true;
 if (TEST_EXCEPTIONS_IN_CALLBACKS) {
 	Meteor.setTimeout(function invalidArgumentTest() {
@@ -140,31 +125,16 @@ if (TEST_EXCEPTIONS_IN_CALLBACKS) {
 	}, Math.random() * 10000);
 }
 
-if (Meteor.isClient) {
-	Meteor.subscribe("log");
-
-	Template.info.helpers({
-		tableData: () => ({
-			tableAttributes: {
-				border: 1
-			}
-		}),
-		serverLog: () => serverCollection.find().map(x => EJSON.stringify(x)),
-	});
-}
-
-
+// test stack trace getting in methods
 if (Meteor.isServer) {
-	Log.storeServerMessages({
-		collection: serverCollection,
-		timeToLiveInHours: 24,
-		additionalLoggingPredicate: () => true,
-		publications: [{
-			pubName: "log",
-		}]
-	});
-
-	Meteor.startup(function() {
-		serverCollection.remove({});
+	Meteor.methods({
+		"capture-stack-in-method": function() {
+			Log.info({
+			    appendStackTrace: true,
+			    tags: ["stack-trace", "meteor-method"]
+			}, "Get stack trace within Meteor Method invocation.");
+		}
 	})
+} else {
+	Meteor.call("capture-stack-in-method");
 }

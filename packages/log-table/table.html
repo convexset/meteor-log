@@ -10,7 +10,7 @@
 			</tr>
 		</thead>
 		<tbody class="{{tbodyClasses}}" {{tbodyAttributes}}>
-			{{#each logItem in clientLog}}
+			{{#each logItem in parsedData}}
 				{{#with logItem}}
 					<tr class="{{trClasses}}" {{trAttributes}}>
 						<td class="{{tdClasses}}" {{tdAttributes}}>{{{ts}}}</td>
