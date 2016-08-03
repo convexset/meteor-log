@@ -1,3 +1,5 @@
+import { Log } from 'meteor/convexset:log';
+
 const serverCollection = new Mongo.Collection("log");
 
 Log.storeServerMessages({
