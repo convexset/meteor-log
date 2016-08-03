@@ -2,6 +2,7 @@ import { Log } from 'meteor/convexset:log';
 
 const serverCollection = new Mongo.Collection("log");
 
+// set-up logging on the server
 Log.storeServerMessages({
 	collection: serverCollection,
 	timeToLiveInHours: 24,
@@ -10,7 +11,5 @@ Log.storeServerMessages({
 		pubName: "log",
 	}]
 });
-
-Meteor.startup(function() {
-	serverCollection.remove({});
-})
+serverCollection.remove({});
+Log.info(5, "----------------------------------------------\nLog messages on the server will now be stored.\n----------------------------------------------");
