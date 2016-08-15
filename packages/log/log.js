@@ -93,7 +93,9 @@ const Log = (function() {
 				ts: {
 					$gte: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
 				},
-				$or: tags.map(tag => ({tags: tag}))
+				tags: {
+					$in: tags
+				}
 			}, {
 				sort: {
 					ts: 1
