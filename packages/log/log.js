@@ -73,6 +73,56 @@ const Log = (function() {
 		PackageUtilities.addPropertyGetter(_log, "allRecordsSerialized", function allRecordsSerialized() {
 			return EJSON.stringify(_log.allRecords);
 		});
+
+		PackageUtilities.addImmutablePropertyFunction(_log, "getRecordsWithTag", function getRecordsWithTag(tag) {
+			return _clientCollection.find({
+				ts: {
+					$gte: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
+				},
+				tags: tag
+			}, {
+				sort: {
+					ts: 1
+				}
+			}).fetch();
+		});
+
+		PackageUtilities.addImmutablePropertyFunction(_log, "getRecordsWithSomeTagInList", function getRecordsWithSomeTagInList(tags) {
+			tags = _.toArray(arguments).reduce((acc, x) => acc.concat(x), []);
+			return _clientCollection.find({
+				ts: {
+					$gte: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
+				},
+				$or: tags.map(tag => ({tags: tag}))
+			}, {
+				sort: {
+					ts: 1
+				}
+			}).fetch();
+		});
+
+		PackageUtilities.addImmutablePropertyFunction(_log, "getRecordsWithAllTags", function getRecordsWithTag(tags) {
+			tags = _.toArray(arguments).reduce((acc, x) => acc.concat(x), []);
+			return _clientCollection.find({
+				ts: {
+					$gte: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
+				},
+				tags: {
+					$all: tags
+				}
+			}, {
+				sort: {
+					ts: 1
+				}
+			}).fetch();
+		});
+
+		PackageUtilities.addImmutablePropertyFunction(_log, "displayRecords", function displayRecords(records) {
+			(_.isArray(records) ? records : [records]).forEach(function(record) {
+				var item = EJSON.parse(record.msg);
+				console[record.ll].apply(console, item);
+			});
+		})
 	}
 
 

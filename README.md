@@ -24,6 +24,7 @@ Messages are stored in a client-side collection to support client debugging and 
 - [Structured Exception Throwing](#structured-exception-throwing)
   - [Partial Application](#partial-application)
 - [Beyond `Meteor.isDevelopment`](#beyond-meteorisdevelopment)
+- [Utilities for Records](#utilities-for-records)
 - [Additional Usage Hints](#additional-usage-hints)
 - [Implementation Patterns](#implementation-patterns)
 
@@ -321,6 +322,25 @@ Log.displayPredicate = function display30PercentOfMessagesAtRandomAndOnlyIfInDev
 ```
 
 (Verbosity requirements still apply.)
+
+
+## Utilities for Records
+
+It was previously mentioned that the entire history of log messages (including those that were not displayed), can be obtained using `Log.allRecords`. For example:
+```
+Log.allRecords.forEach(x => console.log(x))
+```
+(To obtain everything in serialized form one may use `Log.allRecordsSerialized`.)
+
+Here are some additional utilities that might help:
+
+`Log.displayRecords(records)`: displays an array of records "nicely" (e.g.: `Log.displayRecords(Log.allRecords)`)
+
+`Log.getRecordsWithTag(tag)`: returns all records with a particular tag
+
+`Log.getRecordsWithSomeTagInList(tags)`: returns all records with at least one tag in a list of tags (`tags` being an array of tags)
+
+`Log.getRecordsWithAllTags(tags)`: returns all records with all of the list of tags  (`tags` being an array of tags)
 
 
 ## Additional Usage Hints
