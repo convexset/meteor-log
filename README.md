@@ -158,7 +158,7 @@ Log.storeServerMessages({
 
 To elaborate on the options:
  - `collection`:
-   - default: `new Meteor.Collection(null)`
+   - default: `new Mongo.Collection(null)`
    - For logging on a different server, use something like `new Meteor.Collection("log", { /* connection: ... */ })`
  - `timeToLiveInHours`: 
    - default: `24`

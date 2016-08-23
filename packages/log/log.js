@@ -136,7 +136,7 @@ const Log = (function() {
 		var _serverCollection;
 		var _additionalLoggingPredicate;
 		PackageUtilities.addImmutablePropertyFunction(_log, "storeServerMessages", function storeServerMessages({
-			collection = new Meteor.Collection(null),
+			collection = new Mongo.Collection(null),
 			timeToLiveInHours = 24,
 			additionalLoggingPredicate = () => true,
 			publications = []
