@@ -271,6 +271,8 @@ Log.throwException("item-out-of-range", {
 
 To just generate the exception message, use `Log.generateExceptionMessage` instead of `Log.throwException`.
 
+To just generate the exception for later throwing, use `Log.makeException` instead of `Log.throwException`.
+
 What will happen is that a message at "log level" `error` will be logged with verbosity level `0` (and it will be given two tags `"exception"` and the name of the exception). The stack trace will also be included. You may customize verbosity and log level as follows:
 ```javascript
 Log.throwException("invalid-argument", null, {

@@ -124,7 +124,7 @@ const Log = (function() {
 				var item = EJSON.parse(record.msg);
 				console[record.ll].apply(console, item);
 			});
-		})
+		});
 	}
 
 
@@ -407,6 +407,20 @@ const Log = (function() {
 			message: msg,
 			stack: stackTrace
 		});
+
+		// Use revised stack trace
+		var exception = new Meteor.Error(exceptionName, msg, stackTrace);
+		exception.stack = stackTrace;
+		throw exception;
+	});
+
+	PackageUtilities.addImmutablePropertyFunction(_log, "makeException", function makeException(exceptionName, data) {
+		var msg = _log.generateExceptionMessage(exceptionName, data);
+
+		// Obtain stack trace and remove reference to this function
+		var _stackTraceArr = (new Meteor.Error(exceptionName)).stack.split("\n");
+		_stackTraceArr.splice(1, 1);
+		var stackTrace = _stackTraceArr.join("\n");
 
 		// Use revised stack trace
 		var exception = new Meteor.Error(exceptionName, msg, stackTrace);
