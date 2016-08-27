@@ -3,6 +3,7 @@ import { EJSON } from "meteor/ejson";
 
 import { Log } from "meteor/convexset:log";
 
+Log.displayLineNumbers = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register some exceptions

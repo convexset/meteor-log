@@ -22,6 +22,18 @@ function epochViaDelta(delta = 0) {
 	return (new Date()).getTime() + delta;
 }
 
+function getLineNumber() {
+	var line = (new Error("not-really-an-exception")).stack.split("\n")[4];  // where log is called > where getLineNumber is called > here
+	if (line.indexOf(' (') >= 0) {
+		// e.g.: "    at itemOutOfRangeTest (http://localhost:3000/app/app.js?hash=573089fd35d5074ef50256d09685cf30748031a2:225:8)"
+    	let s = line.split(' (')[1];
+		return s.substring(0, s.length - 1);
+	} else {
+		// e.g.: "    at http://localhost:3000/packages/meteor.js?hash=ae8b8affa9680bf9720bd8f7fa112f13a62f71c3:464:45"
+		return line.split('at ')[1];
+	}
+}
+
 const Log = (function() {
 	var _logConstr = function Log() {};
 	var _log = new _logConstr();
@@ -121,7 +133,7 @@ const Log = (function() {
 
 		PackageUtilities.addImmutablePropertyFunction(_log, "displayRecords", function displayRecords(records) {
 			(_.isArray(records) ? records : [records]).forEach(function(record) {
-				var item = EJSON.parse(record.msg);
+				var item = EJSON.parse(record.msg).concat([`\n\t\tat ${record['@']}`])
 				console[record.ll].apply(console, item);
 			});
 		});
@@ -202,6 +214,14 @@ const Log = (function() {
 		get: () => _verbosity,
 		set: (value) => {
 			_verbosity = value;
+		}
+	});
+
+	var _displayLineNumbers = false;
+	PackageUtilities.addPropertyGetterAndSetter(_log, "displayLineNumbers", {
+		get: () => _displayLineNumbers,
+		set: (value) => {
+			_displayLineNumbers = !!value;
 		}
 	});
 
@@ -293,9 +313,12 @@ const Log = (function() {
 				args.push(stackTrace);
 			}
 
+			var lineNumber = getLineNumber();
+
 			if (_displayPredicate() && ((!_.isFunction(_currentDisplayFilter)) || _currentDisplayFilter(options)) && (options.verbosity <= _verbosity)) {
 				// possibly display if in dev mode and verbosity level is right
-				console[logLevel].apply(console, args);
+				var displayArgs = !_displayLineNumbers ? args : args.concat([`\n\t\tat ${lineNumber}`]);
+				console[logLevel].apply(console, displayArgs);
 			}
 
 			if (options.record) {
@@ -305,6 +328,7 @@ const Log = (function() {
 					ts: new Date(),
 					v: options.verbosity,
 					ll: logLevel,
+					'@': lineNumber
 				};
 				if (_.isArray(options.tags)) {
 					var _tags = options.tags
@@ -410,6 +434,7 @@ const Log = (function() {
 
 		// Use revised stack trace
 		var exception = new Meteor.Error(exceptionName, msg, stackTrace);
+
 		exception.stack = stackTrace;
 		throw exception;
 	});

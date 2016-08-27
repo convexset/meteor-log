@@ -64,6 +64,14 @@ Log.info({
 }, "I have one cat.");
 ```
 
+### Displaying Line Numbers Properly
+
+To display line numbers properly, set
+```javascript
+Log.displayLineNumbers = true;
+```
+It is false by default.
+
 ### Capturing the stack
 
 Simply use set the `appendStackTrace` option to `true` (default: `false):
