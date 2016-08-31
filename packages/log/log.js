@@ -23,7 +23,11 @@ function epochViaDelta(delta = 0) {
 }
 
 function getLineNumber() {
-	var line = (new Error("not-really-an-exception")).stack.split("\n")[4];  // where log is called > where getLineNumber is called > here
+	var line = (new Error("not-really-an-exception")).stack.split("\n")[4];  // 0: Error: not-really-an-exception
+	                                                                         // 1: here
+	                                                                         // 2: where getLineNumber is called
+	                                                                         // 3: where log is called
+	                                                                         // 4: what we want
 	if (line.indexOf(' (') >= 0) {
 		// e.g.: "    at itemOutOfRangeTest (http://localhost:3000/app/app.js?hash=573089fd35d5074ef50256d09685cf30748031a2:225:8)"
     	let s = line.split(' (')[1];
@@ -133,7 +137,10 @@ const Log = (function() {
 
 		PackageUtilities.addImmutablePropertyFunction(_log, "displayRecords", function displayRecords(records) {
 			(_.isArray(records) ? records : [records]).forEach(function(record) {
-				var item = EJSON.parse(record.msg).concat([`\n\t\tat ${record['@']}`])
+				var item = EJSON.parse(record.msg);
+				if (!Meteor.isProduction) {
+					item = item.concat([`\n\t\tat ${record['@']}`]);
+				}
 				console[record.ll].apply(console, item);
 			});
 		});
@@ -217,13 +224,31 @@ const Log = (function() {
 		}
 	});
 
-	var _displayLineNumbers = false;
-	PackageUtilities.addPropertyGetterAndSetter(_log, "displayLineNumbers", {
+	let _displayLineNumbers = false;
+	PackageUtilities.addPropertyGetterAndSetter(_log, 'displayLineNumbers', {
 		get: () => _displayLineNumbers,
 		set: (value) => {
 			_displayLineNumbers = !!value;
 		}
 	});
+	let _excludeLineNumbersWith = [];
+	PackageUtilities.addPropertyGetterAndSetter(_log, 'excludeLineNumbersWith', {
+		get: () => {
+			setTimeout(() => {
+				// in case someone decides to do Log.excludeLineNumbersWith.push('xxx');
+				_excludeLineNumbersWith = _excludeLineNumbersWith.map(x => x.toLowerCase());
+			}, 0);
+			return _excludeLineNumbersWith;
+		},
+		set: (value) => {
+			if (_.isArray(value)) {
+				_excludeLineNumbersWith = value.map(x => x.toLowerCase());
+			} else {
+				_excludeLineNumbersWith = [value.toString().toLowerCase()];
+			}
+		}
+	});
+
 
 	var _isDevelopment = !!Meteor.isDevelopment;
 	Meteor.startup(function() {
@@ -299,17 +324,19 @@ const Log = (function() {
 				verbosity: 5,
 				tags: [],
 				record: true,
-				appendStackTrace: false
+				appendStackTrace: false,
+				recordStackTrace: false
 			}, options, {
 				logLevel: logLevel,
 				args: args
 			});
 
+			// Obtain stack trace and remove reference to this function
+			let _stackTraceArr = (new Meteor.Error("not-an-exception")).stack.split("\n");
+			_stackTraceArr.splice(0, 2);
+			let stackTrace = _stackTraceArr.join("\n");
+
 			if (options.appendStackTrace) {
-				// Obtain stack trace and remove reference to this function
-				let _stackTraceArr = (new Meteor.Error("not-an-exception")).stack.split("\n");
-				_stackTraceArr.splice(0, 2);
-				let stackTrace = _stackTraceArr.join("\n");
 				args.push(stackTrace);
 			}
 
@@ -317,7 +344,14 @@ const Log = (function() {
 
 			if (_displayPredicate() && ((!_.isFunction(_currentDisplayFilter)) || _currentDisplayFilter(options)) && (options.verbosity <= _verbosity)) {
 				// possibly display if in dev mode and verbosity level is right
-				var displayArgs = !_displayLineNumbers ? args : args.concat([`\n\t\tat ${lineNumber}`]);
+				let displayLineNumbersHere = _displayLineNumbers;
+				const lineNumberLC = lineNumber.toLowerCase();
+				_excludeLineNumbersWith.forEach(function(item) {
+					if (displayLineNumbersHere && lineNumberLC.indexOf(item) > -1) {
+						displayLineNumbersHere = false;
+					}
+				});
+				const displayArgs = (!displayLineNumbersHere && !Meteor.isProduction) ? args : args.concat([`\n\t\tat ${lineNumber}`]);
 				console[logLevel].apply(console, displayArgs);
 			}
 
@@ -327,9 +361,14 @@ const Log = (function() {
 					msg: EJSON.stringify(args),
 					ts: new Date(),
 					v: options.verbosity,
-					ll: logLevel,
-					'@': lineNumber
+					ll: logLevel
 				};
+				if (options.recordStackTrace) {
+					record['stack'] = stackTrace;
+				}
+				if (!Meteor.isProduction) {
+					record['@'] = lineNumber;
+				}
 				if (_.isArray(options.tags)) {
 					var _tags = options.tags
 						.filter(x => typeof x === "string")

@@ -15,6 +15,7 @@ Messages are stored in a client-side collection to support client debugging and 
 
 - [Usage:](#usage)
   - [Basics](#basics)
+  - [Displaying Line Numbers Properly](#displaying-line-numbers-properly)
   - [Capturing the stack](#capturing-the-stack)
   - [Temporary Nuance in Display](#temporary-nuance-in-display)
   - [Client-side Recording](#client-side-recording)
@@ -72,6 +73,17 @@ Log.displayLineNumbers = true;
 ```
 It is false by default.
 
+To exclude line numbers by content (sub-strings),
+```javascript
+Log.excludeLineNumbersWith = ['file-of-much-logging-and-little-consequence', 'other-file'];
+
+// or even...
+
+Log.excludeLineNumbersWith.push('this-file');
+Log.excludeLineNumbersWith.push('that-file');
+```
+It is `[]` by default.
+
 ### Capturing the stack
 
 Simply use set the `appendStackTrace` option to `true` (default: `false):
@@ -81,6 +93,14 @@ Log.info({
 }, "Stack trace:");
 ```
 and a stack-trace will be appended to the list of arguments passed into the logger.
+
+To only record (but not display) the stack trace, set the `recordStackTrace` option to `true` (default: `false):
+```javascript
+Log.info({
+    recordStackTrace: true
+}, "Stack trace recorded.");
+```
+and a stack-trace will be stored in the relevant collection(s) if recording is enabled.
 
 ### Temporary Nuance in Display
 

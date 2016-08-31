@@ -1,5 +1,4 @@
 Package.describe({
-  // [validatis:stack]
   name: 'convexset:log-table',
   version: '0.1.0',
   summary: 'Provides a simple table for client-side data of convexset:log',
