@@ -121,6 +121,9 @@ const Log = (function() {
 
 		PackageUtilities.addImmutablePropertyFunction(_log, "getRecordsWithAllTags", function getRecordsWithTag(tags) {
 			tags = _.toArray(arguments).reduce((acc, x) => acc.concat(x), []);
+			if (tags.length === 0) {
+				return _log.allRecords;
+			}
 			return _clientCollection.find({
 				ts: {
 					$gte: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
