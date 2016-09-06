@@ -22,30 +22,54 @@ function safeStringify(o) {
 	return EJSON.stringify(stripCircularDeps(o), {canonical: true});
 }
 
-function stripCircularDeps(o, priors) {
-	const _o = {};
+function stripCircularDeps(o, priors, paths, currPath) {
+	let _o;
 	if (typeof o !== 'object') {
 		return o;
 	}
 	if (typeof priors === 'undefined') {
-		return stripCircularDeps(o, [o]);
+		return stripCircularDeps(o, [o], ['@'], '@');
 	}
 
 	const keysToProceedWith = [];
-	Object.keys(o).forEach(k => {
-		if (priors.indexOf(o[k]) > -1) {
-			// circular dep: snip!
-			_o[k] = '*** circular dependency ***';
-		} else if (typeof o === 'object') {
-			keysToProceedWith.push(k);
-			priors.push(o[k]);
-		} else {
-			_o[k] = o[k];
-		}
-	});
-	keysToProceedWith.forEach(k => {
-		_o[k] = stripCircularDeps(o[k], priors);
-	});
+	if (_.isArray(o)) {
+		_o = [];
+		o.forEach((item, idx) => {
+			if (priors.indexOf(item) > -1) {
+				// circular dep: snip!
+				_o.push(`*** circular dependency (${paths[priors.indexOf(item)]}) ***`);
+			} else if (typeof item === 'object') {
+				keysToProceedWith.push(idx);
+				priors.push(item);
+				paths.push(`${currPath}.${idx}`);
+				_o.push(void 0);
+			} else {
+				// not an object
+				_o.push(item);
+			}
+		});
+		keysToProceedWith.forEach(idx => {
+			_o[idx] = stripCircularDeps(o[idx], priors, paths, `${currPath}.${idx}`);
+		});
+	} else {
+		_o = {};
+		Object.keys(o).forEach(k => {
+			if (priors.indexOf(o[k]) > -1) {
+				// circular dep: snip!
+				_o[k] = `*** circular dependency (${paths[priors.indexOf(o[k])]}) ***`;
+			} else if (typeof o[k] === 'object') {
+				keysToProceedWith.push(k);
+				priors.push(o[k]);
+				paths.push(`${currPath}.${k}`);
+			} else {
+				// not an object
+				_o[k] = o[k];
+			}
+		});
+		keysToProceedWith.forEach(k => {
+			_o[k] = stripCircularDeps(o[k], priors, paths, `${currPath}.${k}`);
+		});
+	}
 	return _o;
 }
 
