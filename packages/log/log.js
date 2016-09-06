@@ -15,6 +15,41 @@ import { EJSON } from 'meteor/ejson';
 import { DDP } from 'meteor/ddp-client';
 
 ////////////////////////////////////////////////////////////////////////////////
+// Safely Stringifying Things
+////////////////////////////////////////////////////////////////////////////////
+
+function safeStringify(o) {
+	return EJSON.stringify(stripCircularDeps(o), {canonical: true});
+}
+
+function stripCircularDeps(o, priors) {
+	const _o = {};
+	if (typeof o !== 'object') {
+		return o;
+	}
+	if (typeof priors === 'undefined') {
+		return stripCircularDeps(o, [o]);
+	}
+
+	const keysToProceedWith = [];
+	Object.keys(o).forEach(k => {
+		if (priors.indexOf(o[k]) > -1) {
+			// circular dep: snip!
+			_o[k] = '*** circular dependency ***';
+		} else if (typeof o === 'object') {
+			keysToProceedWith.push(k);
+			priors.push(o[k]);
+		} else {
+			_o[k] = o[k];
+		}
+	});
+	keysToProceedWith.forEach(k => {
+		_o[k] = stripCircularDeps(o[k], priors);
+	});
+	return _o;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // The Main Event
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +122,7 @@ const Log = (function() {
 		});
 
 		PackageUtilities.addPropertyGetter(_log, "allRecordsSerialized", function allRecordsSerialized() {
-			return EJSON.stringify(_log.allRecords);
+			return safeStringify(_log.allRecords);
 		});
 
 		PackageUtilities.addImmutablePropertyFunction(_log, "getRecordsWithTag", function getRecordsWithTag(tag) {
@@ -361,7 +396,7 @@ const Log = (function() {
 			if (options.record) {
 				// if recording is not suppressed
 				var record = {
-					msg: EJSON.stringify(args),
+					msg: safeStringify(args),
 					ts: new Date(),
 					v: options.verbosity,
 					ll: logLevel
@@ -514,7 +549,9 @@ const Log = (function() {
 ////////////////////////////////////////////////////////////////////////////////
 
 export {
-	Log
+	Log,
+	safeStringify,
+	stripCircularDeps
 };
 
 ////////////////////////////////////////////////////////////////////////////////
