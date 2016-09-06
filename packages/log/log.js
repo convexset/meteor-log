@@ -38,7 +38,7 @@ function stripCircularDeps(o, priors, paths, currPath) {
 			if (priors.indexOf(item) > -1) {
 				// circular dep: snip!
 				_o.push(`*** circular dependency (${paths[priors.indexOf(item)]}) ***`);
-			} else if (typeof item === 'object') {
+			} else if (!!item && (typeof item === 'object')) {
 				keysToProceedWith.push(idx);
 				priors.push(item);
 				paths.push(`${currPath}.${idx}`);
@@ -57,7 +57,7 @@ function stripCircularDeps(o, priors, paths, currPath) {
 			if (priors.indexOf(o[k]) > -1) {
 				// circular dep: snip!
 				_o[k] = `*** circular dependency (${paths[priors.indexOf(o[k])]}) ***`;
-			} else if (typeof o[k] === 'object') {
+			} else if (!!o[k] && (typeof o[k] === 'object')) {
 				keysToProceedWith.push(k);
 				priors.push(o[k]);
 				paths.push(`${currPath}.${k}`);
