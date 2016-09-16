@@ -82,14 +82,14 @@ function epochViaDelta(delta = 0) {
 }
 
 function getLineNumber() {
-	var line = (new Error("not-really-an-exception")).stack.split("\n")[4];  // 0: Error: not-really-an-exception
-	                                                                         // 1: here
-	                                                                         // 2: where getLineNumber is called
-	                                                                         // 3: where log is called
-	                                                                         // 4: what we want
+	const line = (new Error('not-really-an-exception')).stack.split('\n')[4]; // 0: Error: not-really-an-exception
+	                                                                          // 1: here
+	                                                                          // 2: where getLineNumber is called
+	                                                                          // 3: where log is called
+	                                                                          // 4: what we want
 	if (line.indexOf(' (') >= 0) {
 		// e.g.: "    at itemOutOfRangeTest (http://localhost:3000/app/app.js?hash=573089fd35d5074ef50256d09685cf30748031a2:225:8)"
-    	let s = line.split(' (')[1];
+		const s = line.split(' (')[1];
 		return s.substring(0, s.length - 1);
 	} else {
 		// e.g.: "    at http://localhost:3000/packages/meteor.js?hash=ae8b8affa9680bf9720bd8f7fa112f13a62f71c3:464:45"
