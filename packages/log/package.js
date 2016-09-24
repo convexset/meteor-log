@@ -1,7 +1,7 @@
 Package.describe({
 	// [validatis:stack]
 	name: 'convexset:log',
-	version: '0.1.5_5',
+	version: '0.1.5_6',
 	summary: 'A logging package that supports productive development and debugging in production',
 	git: 'https://github.com/convexset/meteor-log',
 	documentation: '../../README.md'
