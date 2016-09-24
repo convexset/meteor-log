@@ -2,10 +2,10 @@
 // Boiler Plate
 ////////////////////////////////////////////////////////////////////////////////
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions';
-checkNpmVersions({  
+checkNpmVersions({
 	'package-utils': '^0.2.1',
 	'underscore': '^1.8.3'
-});  // package name can be omitted
+});
 const PackageUtilities = require('package-utils');
 const _ = require('underscore');
 
@@ -13,6 +13,7 @@ import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { EJSON } from 'meteor/ejson';
 import { DDP } from 'meteor/ddp-client';
+import { Tracker } from 'meteor/tracker';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Safely Stringifying Things
@@ -108,29 +109,40 @@ const Log = (function() {
 	////////////////////////////////////////////////////////////////////////////
 	if (Meteor.isClient) {
 		var _clientCollection = new Mongo.Collection(null);
-		var hoursToKeep = 0.5;
+		var hoursToKeep = 0.25;
 
-		Meteor.startup(function() {
-			function cleanUpCollection() {
-				_clientCollection.remove({
-					ts: {
-						$lt: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
-					}
-				});
+		function cleanUpCollection() {
+			_clientCollection.remove({
+				ts: {
+					$lt: new Date(epochViaDelta(-1000 * 60 * 60 * hoursToKeep))
+				}
+			});
+		}
+
+		var clearingIntervalId = null;
+		PackageUtilities.addPropertyGetterAndSetter(_log, "hoursOfDataToKeep", {
+			get: () => hoursToKeep,
+			set: function(value) {
+				if (!!clearingIntervalId) {
+					Meteor.clearInterval(clearingIntervalId);
+					clearingIntervalId = null;
+				}
+				hoursToKeep = value;
+				cleanUpCollection();
+				clearingIntervalId = Meteor.setInterval(cleanUpCollection, 1000 * 60 * 60 * hoursToKeep * 0.1);
 			}
+		});
 
-			var clearingIntervalId;
+		Meteor.startup(() => {
+			_log.hoursOfDataToKeep = 0.25;
 
-			PackageUtilities.addPropertyGetterAndSetter(_log, "hoursOfDataToKeep", {
-				get: () => hoursToKeep,
-				set: function(value) {
-					if (!!clearingIntervalId) {
-						Meteor.clearInterval(clearingIntervalId);
-						clearingIntervalId = null;
-					}
-					hoursToKeep = value;
-					cleanUpCollection();
-					clearingIntervalId = Meteor.setInterval(cleanUpCollection, 1000 * 60 * 60 * hoursToKeep * 0.1);
+			Tracker.autorun(() => {
+				if (!_.isFunction(Meteor.userId)) {
+					return;
+				}
+				console.info(`Meteor.userId: ${Meteor.userId()}`);
+				if (!Meteor.userId()) {
+					_clientCollection.remove({});
 				}
 			});
 		});
@@ -573,7 +585,6 @@ const Log = (function() {
 ////////////////////////////////////////////////////////////////////////////////
 // Exports
 ////////////////////////////////////////////////////////////////////////////////
-
 export {
 	Log,
 	safeStringify,

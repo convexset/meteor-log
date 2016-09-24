@@ -131,9 +131,11 @@ Log.currentDisplayFilter = null;
 
 ### Client-side Recording
 
-Setting the number of hours of data to keep (default: 0.5):
+*Note: This collection is cleared on logout.*
+
+Setting the number of hours of data to keep (default: 0.25):
 ```javascript
-Log.hoursOfDataToKeep = 2.5;  // Keep two and a half hours of data
+Log.hoursOfDataToKeep = 5 * (1/60);  // Keep 5 min of data
 ```
 
 Showing history of log messages (including those that were not displayed), use `Log.allRecords`. For example:
