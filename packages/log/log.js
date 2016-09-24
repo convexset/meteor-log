@@ -140,7 +140,7 @@ const Log = (function() {
 				if (!_.isFunction(Meteor.userId)) {
 					return;
 				}
-				console.info(`Meteor.userId: ${Meteor.userId()}`);
+				_log.info(`Meteor.userId: ${Meteor.userId()}`);
 				if (!Meteor.userId()) {
 					_clientCollection.remove({});
 				}
