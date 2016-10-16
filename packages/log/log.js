@@ -426,7 +426,7 @@ const Log = (function() {
 						displayLineNumbersHere = false;
 					}
 				});
-				const displayArgs = (!displayLineNumbersHere && !Meteor.isProduction) ? args : args.concat([`\n\t\tat ${lineNumber}`]);
+				const displayArgs = (!displayLineNumbersHere || Meteor.isProduction) ? args : args.concat([`\n\t\tat ${lineNumber}`]);
 				console[logLevel].apply(console, displayArgs);
 			}
 
