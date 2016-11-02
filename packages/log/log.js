@@ -516,7 +516,7 @@ const Log = (function() {
 
 	PackageUtilities.addImmutablePropertyFunction(_log, "generateExceptionMessage", function generateExceptionMessage(exceptionName, data) {
 		if (!registeredExceptions[exceptionName]) {
-			throw new Meteor.Error("exception-not-registered");
+			throw new Meteor.Error("exception-not-registered", exceptionName);
 		}
 		return _.isFunction(registeredExceptions[exceptionName]) ? registeredExceptions[exceptionName](data) : registeredExceptions[exceptionName];
 	});
