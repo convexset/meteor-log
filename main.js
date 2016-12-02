@@ -1,5 +1,5 @@
-import { Meteor } from "meteor/meteor";
-import { EJSON } from "meteor/ejson";
+import { Meteor } from 'meteor/meteor';
+import { EJSON } from 'meteor/ejson';
 
 import { Log } from "meteor/convexset:log";
 
