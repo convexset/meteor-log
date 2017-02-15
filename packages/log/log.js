@@ -133,17 +133,15 @@ const Log = (function() {
 			}
 		});
 
-		Meteor.startup(() => {
-			_log.hoursOfDataToKeep = 0.25;
+		_log.hoursOfDataToKeep = 0.25;
 
-			Tracker.autorun(() => {
-				if (!_.isFunction(Meteor.userId)) {
-					return;
-				}
-				if (!Meteor.userId()) {
-					_clientCollection.remove({});
-				}
-			});
+		Tracker.autorun(() => {
+			if (!_.isFunction(Meteor.userId)) {
+				return;
+			}
+			if (!Meteor.userId()) {
+				_clientCollection.remove({});
+			}
 		});
 
 		PackageUtilities.addPropertyGetter(_log, "allRecords", function allRecords() {
